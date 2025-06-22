@@ -10,7 +10,7 @@ To build the project, you can use the provided Makefile:
 make
 ```
 
-This will create the executables `savigny`, `kelsen`, and `kelsen_transpiler`.
+This will create the executable `savigny`.
 
 ## Cleaning
 
