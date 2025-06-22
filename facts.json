@@ -1,0 +1,30 @@
+[
+  {
+    "key": "asset_1",
+    "variable_name": "EL_ARRENDATARIO_HA_PAGADO_PUNT_1",
+    "asset_name": "El ARRENDATARIO acuerda arrendamiento al ARRENDADOR",
+    "description": "acuerda arrendamiento",
+    "asset_id": 1,
+    "is_true": true,
+    "rows": 1,
+    "cols": 1,
+    "type": 0,
+    "data": [
+      1
+    ]
+  },
+  {
+    "key": "asset_1",
+    "variable_name": "EL_ARRENDADOR_NO_HA_REPARADO_U_2",
+    "asset_name": "El ARRENDATARIO acuerda arrendamiento al ARRENDADOR",
+    "description": "acuerda arrendamiento",
+    "asset_id": 1,
+    "is_true": true,
+    "rows": 1,
+    "cols": 1,
+    "type": 0,
+    "data": [
+      1
+    ]
+  }
+]

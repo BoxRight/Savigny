@@ -1,0 +1,80 @@
+{
+  "instituciones": [
+    "Compraventa", 
+    "Arrendamiento", 
+    "Amparo", 
+    "Testamento",
+    "Hipoteca",
+    "Sociedad",
+    "Mandato",
+    "Donación",
+    "Prenda"
+  ],
+  "tipos": [
+    "contrato",
+    "procedimiento",
+    "acto jurídico",
+    "hecho jurídico",
+    "acto",
+    "hecho"
+  ],
+  "dominios": [
+    "derecho-patrimonial-privado",
+    "derecho-constitucional",
+    "derecho-mercantil",
+    "derecho-sucesorio",
+    "derecho-administrativo",
+    "derecho-fiscal",
+    "derecho-laboral",
+    "derecho-energético"
+  ],
+  "roles": {
+    "Compraventa": ["comprador", "vendedor"],
+    "Arrendamiento": ["arrendador", "arrendatario"],
+    "Amparo": ["quejoso", "autoridad", "juez"],
+    "Testamento": ["testador", "heredero", "albacea"],
+    "Hipoteca": ["acreedor", "deudor", "garante"],
+    "Sociedad": ["socio", "administrador"],
+    "Mandato": ["mandante", "mandatario"],
+    "Donación": ["donante", "donatario"],
+    "Prenda": ["acreedor", "deudor"]
+  },
+  "deonticos": {
+    "debe": "obligacion",
+    "no-debe": "prohibicion",
+    "puede": "privilegio",
+    "tiene-derecho-a": "derecho",
+    "tiene-derecho-sobre": "derecho"
+  },
+  "default-norms": {
+  	"derecho-energético": [
+  	{
+  		"role": "arrendador",
+  		"deontic": "tiene-derecho-a",
+  		"action": "define instalaciones y equipo como planta generadora",
+  		"scope": "sitio de generación",
+  		"conditional": true,
+  		"condition": "las instalaciones son específicas para el sitio y permiten la generación de electricidad",
+  		"reference": "Artículo 3 Fracción IV"
+  	},
+  	{
+  		"role": "arrendador",
+  		"deontic": "tiene-derecho-sobre",
+  		"action": "acredita producción de energía mediante título",
+  		"scope": "energía limpia",
+  		"conditional": true,
+  		"condition": "produce de acuerdo a los estándares de la CFE",
+  		"reference": "Artículo 3 Fracción VIII"
+  	},
+  	{
+  		"role": "",
+  		"deontic": "",
+  		"action": "",
+  		"scope": "",
+  		"conditional": false,
+  		"condition":"",
+  		"reference": ""
+  	}
+  	]
+  }
+}

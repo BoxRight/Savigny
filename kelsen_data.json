@@ -1,0 +1,304 @@
+{
+  "contracts": [
+    {
+      "id": 1,
+      "key": "El ARRENDATARIO acuerda arrendamiento al ARRENDADOR",
+      "subject1": "ARRENDATARIO",
+      "subject2": "ARRENDADOR",
+      "description": "acuerda arrendamiento",
+      "type": 0
+    },
+    {
+      "id": 2,
+      "key": "El ARRENDATARIO pagar 1200 mensuales por concepto de renta al ARRENDADOR",
+      "subject1": "ARRENDATARIO",
+      "subject2": "ARRENDADOR",
+      "description": "pagar 1200 mensuales por concepto de renta",
+      "type": 0
+    },
+    {
+      "id": 3,
+      "key": "El ARRENDADOR mantener el inmueble en condiciones habitables al ARRENDATARIO",
+      "subject1": "ARRENDADOR",
+      "subject2": "ARRENDATARIO",
+      "description": "mantener el inmueble en condiciones habitables",
+      "type": 0
+    },
+    {
+      "id": 4,
+      "key": "El ARRENDATARIO subarrendar el inmueble sin autorización escrita al ARRENDADOR",
+      "subject1": "ARRENDATARIO",
+      "subject2": "ARRENDADOR",
+      "description": "subarrendar el inmueble sin autorización escrita",
+      "type": 0
+    },
+    {
+      "id": 5,
+      "key": "El ARRENDADOR realizar reparaciones estructurales necesarias al ARRENDATARIO",
+      "subject1": "ARRENDADOR",
+      "subject2": "ARRENDATARIO",
+      "description": "realizar reparaciones estructurales necesarias",
+      "type": 0
+    },
+    {
+      "id": 6,
+      "key": "El ARRENDADOR cubrir los gastos de reparación al ARRENDATARIO",
+      "subject1": "ARRENDADOR",
+      "subject2": "ARRENDATARIO",
+      "description": "cubrir los gastos de reparación",
+      "type": 0
+    },
+    {
+      "id": 7,
+      "key": "El ARRENDADOR se produzcan daños por causas no atribuibles al arrendatario al ARRENDATARIO",
+      "subject1": "ARRENDADOR",
+      "subject2": "ARRENDATARIO",
+      "description": "se produzcan daños por causas no atribuibles al arrendatario",
+      "type": 0
+    },
+    {
+      "id": 8,
+      "key": "El ARRENDATARIO notificar por escrito con 30 días de anticipación al ARRENDADOR",
+      "subject1": "ARRENDATARIO",
+      "subject2": "ARRENDADOR",
+      "description": "notificar por escrito con 30 días de anticipación",
+      "type": 0
+    },
+    {
+      "id": 9,
+      "key": "El ARRENDATARIO el arrendatario desee renovar el contrato al ARRENDADOR",
+      "subject1": "ARRENDATARIO",
+      "subject2": "ARRENDADOR",
+      "description": "el arrendatario desee renovar el contrato",
+      "type": 0
+    },
+    {
+      "id": 10,
+      "key": "El ARRENDADOR rescindir el contrato previo aviso de 15 días al ARRENDATARIO",
+      "subject1": "ARRENDADOR",
+      "subject2": "ARRENDATARIO",
+      "description": "rescindir el contrato previo aviso de 15 días",
+      "type": 0
+    },
+    {
+      "id": 11,
+      "key": "El ARRENDATARIO retener el pago de renta hasta que se realicen las reparaciones necesarias al ARRENDADOR",
+      "subject1": "ARRENDATARIO",
+      "subject2": "ARRENDADOR",
+      "description": "retener el pago de renta hasta que se realicen las reparaciones necesarias",
+      "type": 0
+    }
+  ],
+  "clauses": [
+    {
+      "key": "norm1",
+      "condition_id1": 1,
+      "condition_id2": -1,
+      "consequence_id": 2
+    },
+    {
+      "key": "norm2",
+      "condition_id1": 1,
+      "condition_id2": -1,
+      "consequence_id": 3
+    },
+    {
+      "key": "norm3",
+      "condition_id1": 1,
+      "condition_id2": -1,
+      "consequence_id": 4
+    },
+    {
+      "key": "norm4",
+      "condition_id1": 1,
+      "condition_id2": -1,
+      "consequence_id": 5
+    },
+    {
+      "key": "norm5",
+      "condition_id1": 1,
+      "condition_id2": 7,
+      "consequence_id": 6
+    },
+    {
+      "key": "norm6",
+      "condition_id1": 1,
+      "condition_id2": 9,
+      "consequence_id": 8
+    },
+    {
+      "key": "viol_clause_1",
+      "condition_id1": 2,
+      "condition_id2": -1,
+      "consequence_id": 10
+    },
+    {
+      "key": "compound_viol_clause_2",
+      "condition_id1": 3,
+      "condition_id2": 5,
+      "consequence_id": 11
+    }
+  ],
+  "matrices": [
+    {
+      "key": "norm1",
+      "rows": 3,
+      "cols": 2,
+      "type": 1,
+      "data": [
+        1,
+        1,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "key": "norm2",
+      "rows": 3,
+      "cols": 2,
+      "type": 1,
+      "data": [
+        1,
+        1,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "key": "norm3",
+      "rows": 3,
+      "cols": 2,
+      "type": 2,
+      "data": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "key": "norm4",
+      "rows": 3,
+      "cols": 2,
+      "type": 1,
+      "data": [
+        1,
+        1,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "key": "norm5",
+      "rows": 7,
+      "cols": 3,
+      "type": 17,
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "key": "norm6",
+      "rows": 7,
+      "cols": 3,
+      "type": 17,
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "key": "viol_clause_1",
+      "rows": 3,
+      "cols": 2,
+      "type": 4,
+      "data": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "key": "compound_viol_clause_2",
+      "rows": 8,
+      "cols": 3,
+      "type": 19,
+      "data": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1
+      ]
+    }
+  ]
+}

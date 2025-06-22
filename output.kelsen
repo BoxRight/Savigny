@@ -1,0 +1,51 @@
+// String definitions for actions
+string arrendamiento = "acuerda arrendamiento";
+string pagar = "pagar 1200 mensuales por concepto de renta";
+string mantener = "mantener el inmueble en condiciones habitables";
+string subarrendar = "subarrendar el inmueble sin autorización escrita";
+string realizar = "realizar reparaciones estructurales necesarias";
+string cubrir = "cubrir los gastos de reparación";
+string notificar = "notificar por escrito con 30 días de anticipación";
+
+// Subject declarations
+subject ARRENDATARIO = "Placeholder arrendatario", "Placeholder address", 12345678, "placeholderarrendatario@example.com";
+subject ARRENDADOR = "Placeholder arrendador", "Placeholder address", 12345678, "placeholderarrendador@example.com";
+
+// Base contract asset
+asset Arrendamiento = Service, +, ARRENDATARIO, arrendamiento, ARRENDADOR;
+
+// Norm assets
+asset PagarAsset1 = Property, NM, ARRENDATARIO, pagar, ARRENDADOR;
+clause norm1 = { Arrendamiento, OB(PagarAsset1) };
+asset MantenerAsset2 = Property, NM, ARRENDADOR, mantener, ARRENDATARIO;
+clause norm2 = { Arrendamiento, OB(MantenerAsset2) };
+asset SubarrendarAsset3 = Service, +, ARRENDATARIO, subarrendar, ARRENDADOR;
+clause norm3 = { Arrendamiento, PR(SubarrendarAsset3) };
+asset RealizarAsset4 = Service, +, ARRENDADOR, realizar, ARRENDATARIO;
+clause norm4 = { Arrendamiento, OB(RealizarAsset4) };
+asset CubrirAsset5 = Service, +, ARRENDADOR, cubrir, ARRENDATARIO;
+// Conditional norm
+string condition5 = "se produzcan daños por causas no atribuibles al arrendatario";
+asset Condition5 = Service, +, ARRENDADOR, condition5, ARRENDATARIO;
+clause norm5 = { Arrendamiento AND Condition5, OB(CubrirAsset5) };
+asset NotificarAsset6 = Service, +, ARRENDATARIO, notificar, ARRENDADOR;
+// Conditional norm
+string condition6 = "el arrendatario desee renovar el contrato";
+asset Condition6 = Service, +, ARRENDATARIO, condition6, ARRENDADOR;
+clause norm6 = { Arrendamiento AND Condition6, OB(NotificarAsset6) };
+
+// Violation clauses
+string violation_string_1 = "rescindir el contrato previo aviso de 15 días";
+asset RescindirConsequence1 = Service, +, ARRENDADOR, violation_string_1, ARRENDATARIO;
+clause viol_clause_1 = { not(PagarAsset1), CR(RescindirConsequence1) };
+// Compound violation for norms 2 and 4
+string compound_violation_string_2 = "retener el pago de renta hasta que se realicen las reparaciones necesarias";
+asset RetenerCompoundConsequence2 = Service, +, ARRENDATARIO, compound_violation_string_2, ARRENDADOR;
+clause compound_viol_clause_2 = { not(MantenerAsset2) AND not(RealizarAsset4), PVG(RetenerCompoundConsequence2) };
+
+// Facts
+fact EL_ARRENDATARIO_HA_PAGADO_PUNT_1 = Arrendamiento, "el arrendatario ha pagado puntualmente durante seis meses consecutivos", "comprobantes de transferencia bancaria de enero a junio 2023";
+fact EL_ARRENDADOR_NO_HA_REPARADO_U_2 = Arrendamiento, "el arrendador no ha reparado una filtración en el techo reportada hace tres meses", "solicitudes de reparación fechadas y fotografías del daño progresivo";
+
+// Agendas
+agenda ArrendatarioBreach1 = BREACH {Arrendamiento, PagarAsset1, MantenerAsset2, SubarrendarAsset3, RealizarAsset4, CubrirAsset5, NotificarAsset6};

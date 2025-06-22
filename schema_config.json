@@ -1,0 +1,49 @@
+{
+  "instituciones": [
+    "Compraventa", 
+    "Arrendamiento", 
+    "Amparo", 
+    "Testamento",
+    "Hipoteca",
+    "Sociedad",
+    "Mandato",
+    "Donación",
+    "Prenda"
+  ],
+  "tipos": [
+    "contrato",
+    "procedimiento",
+    "acto jurídico",
+    "hecho jurídico",
+    "acto",
+    "hecho"
+  ],
+  "dominios": [
+    "derecho-patrimonial-privado",
+    "derecho-constitucional",
+    "derecho-mercantil",
+    "derecho-sucesorio",
+    "derecho-administrativo",
+    "derecho-fiscal",
+    "derecho-laboral",
+    "derecho-energético"
+  ],
+  "roles": {
+    "Compraventa": ["comprador", "vendedor"],
+    "Arrendamiento": ["arrendador", "arrendatario"],
+    "Amparo": ["quejoso", "autoridad", "juez"],
+    "Testamento": ["testador", "heredero", "albacea"],
+    "Hipoteca": ["acreedor", "deudor", "garante"],
+    "Sociedad": ["socio", "administrador"],
+    "Mandato": ["mandante", "mandatario"],
+    "Donación": ["donante", "donatario"],
+    "Prenda": ["acreedor", "deudor"]
+  },
+  "deonticos": {
+    "debe": "obligacion",
+    "no-debe": "prohibicion",
+    "puede": "privilegio",
+    "tiene-derecho-a": "derecho",
+    "tiene-derecho-sobre": "derecho"
+  }
+}

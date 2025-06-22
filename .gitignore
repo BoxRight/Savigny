@@ -1,0 +1,14 @@
+# Executables
+savigny
+kelsen_transpiler
+kelsen
+
+# Object files
+*.o
+
+# Generated files
+schema_parser.tab.c
+schema_parser.tab.h
+schema_parser.output
+ast_output.json
+tokens.h 
