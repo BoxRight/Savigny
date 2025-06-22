@@ -38,6 +38,11 @@ void config_set_current_institution(const char* institution);
 const char* config_get_current_institution(void);
 
 /**
+ * Get the entire automated_norms configuration object
+ */
+cJSON* config_get_automated_norms(void);
+
+/**
  * Validate an institution name
  * 
  * @param institution Name to validate

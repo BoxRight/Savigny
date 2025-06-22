@@ -131,6 +131,16 @@ const char* config_get_current_institution(void) {
 }
 
 /**
+ * Get the entire automated_norms configuration object
+ */
+cJSON* config_get_automated_norms(void) {
+    if (config == NULL) {
+        return NULL;
+    }
+    return cJSON_GetObjectItem(config, "automated_norms");
+}
+
+/**
  * Validate an institution name
  */
 bool config_is_valid_institution(const char* institution) {

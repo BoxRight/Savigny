@@ -130,9 +130,12 @@ int main(int argc, char** argv) {
         config_cleanup();
         return EXIT_FAILURE;
     }
+
+    /* Apply automated norms to enrich the schema */
+    schema_apply_automated_norms(schema);
     
     if (verbose) {
-        printf("Successfully parsed schema\n");
+        printf("Successfully parsed schema and applied automated norms\n");
         printf("Generating Kelsen code...\n");
     }
 

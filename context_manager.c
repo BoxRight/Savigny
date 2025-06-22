@@ -1,34 +1,33 @@
 /**
  * context_manager.c
  * 
- * Implementation of the legal context manager for the Kelsen schema transpiler
+ * Implementation of the legal context manager and automated norm generation.
  */
 
 #include "context_manager.h"
+#include "config_validator.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <cJSON.h>
+#include <cjson/cJSON.h>
 
 /* The loaded context database */
 static cJSON* legal_context = NULL;
 
 /**
- * Initialize the context manager with a JSON file
+ * Initialize the legal context module
  */
-bool context_init(const char* context_file) {
-    FILE* file = fopen(context_file, "r");
+bool legal_context_init(const char* filename) {
+    FILE* file = fopen(filename, "r");
     if (file == NULL) {
-        fprintf(stderr, "Error opening context file: %s\n", context_file);
+        fprintf(stderr, "Error opening context file: %s\n", filename);
         return false;
     }
     
-    /* Get file size */
     fseek(file, 0, SEEK_END);
     long file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
     
-    /* Read file content */
     char* buffer = (char*)malloc(file_size + 1);
     if (buffer == NULL) {
         fprintf(stderr, "Memory allocation error\n");
@@ -36,18 +35,10 @@ bool context_init(const char* context_file) {
         return false;
     }
     
-    size_t read_size = fread(buffer, 1, file_size, file);
+    fread(buffer, 1, file_size, file);
     fclose(file);
-    
-    if (read_size != file_size) {
-        fprintf(stderr, "Error reading context file\n");
-        free(buffer);
-        return false;
-    }
-    
     buffer[file_size] = '\0';
     
-    /* Parse JSON */
     legal_context = cJSON_Parse(buffer);
     free(buffer);
     
@@ -59,11 +50,10 @@ bool context_init(const char* context_file) {
     return true;
 }
 
-
 /**
- * Clean up resources used by the context manager
+ * Clean up resources used by the legal context module
  */
-void context_cleanup(void) {
+void legal_context_cleanup(void) {
     if (legal_context != NULL) {
         cJSON_Delete(legal_context);
         legal_context = NULL;
@@ -610,5 +600,196 @@ cJSON* context_infer_role_mappings(const char* contract_type) {
     }
     
     return inferred_mappings;
+}
+
+char* generate_kelsen_code_with_context(const Schema* schema) {
+    // ... implementation ...
+    return buffer;
+}
+
+static void apply_domain_defaults(Schema* schema, cJSON* domain_defaults, int* next_norm_id) {
+    const char* domain = schema->institution->domain;
+    cJSON* defaults = cJSON_GetObjectItem(domain_defaults, domain);
+    if (!cJSON_IsArray(defaults)) {
+        return;
+    }
+
+    // Find the highest existing norm ID to avoid conflicts.
+    int max_id = 0;
+    for (Norm* n = schema->norms; n != NULL; n = n->next) {
+        if (n->number > max_id) {
+            max_id = n->number;
+        }
+    }
+    // Start automated norm IDs from a higher number.
+    int next_norm_id = (max_id / 100 + 1) * 100;
+
+    cJSON* default_norm_json;
+    cJSON_ArrayForEach(default_norm_json, defaults) {
+        char* role = cJSON_GetObjectItem(default_norm_json, "role")->valuestring;
+        char* deontic_str = cJSON_GetObjectItem(default_norm_json, "deontic")->valuestring;
+        char* action = cJSON_GetObjectItem(default_norm_json, "action")->valuestring;
+        
+        if (role && deontic_str && action) {
+            char final_action[1024];
+            strncpy(final_action, action, sizeof(final_action) - 1);
+
+            cJSON* reference_json = cJSON_GetObjectItem(default_norm_json, "reference");
+            if (reference_json && cJSON_IsString(reference_json)) {
+                snprintf(final_action + strlen(final_action), sizeof(final_action) - strlen(final_action),
+                         " [Ref: %s]", reference_json->valuestring);
+            }
+            
+            DeonticOperator deontic = config_get_deontic_operator(deontic_str);
+            Norm* new_norm = create_norm((*next_norm_id)++, strdup(role), deontic, strdup(final_action));
+            
+            cJSON* scope_json = cJSON_GetObjectItem(default_norm_json, "scope");
+            if (scope_json && cJSON_IsString(scope_json)) {
+                add_scope_to_norm(new_norm, strdup(scope_json->valuestring));
+            }
+            
+            add_norm_to_schema(schema, new_norm);
+            printf("Added default norm for domain %s: %s\n", domain, final_action);
+        }
+    }
+}
+
+static void apply_universal_templates(Schema* schema, cJSON* universal_templates, int* next_norm_id) {
+    const char* domain = schema->institution->domain;
+    cJSON* templates = cJSON_GetObjectItem(universal_templates, domain);
+    if (!cJSON_IsArray(templates)) {
+        return;
+    }
+
+    // Create a snapshot of original norms to iterate over
+    Norm* original_norms[100]; // Assume max 100 original norms
+    int count = 0;
+    for (Norm* n = schema->norms; n != NULL && count < 100; n = n->next) {
+        if (n->number < 1000) { // Simple check for original vs generated
+             original_norms[count++] = n;
+        }
+    }
+
+    for (int i = 0; i < count; i++) {
+        Norm* user_norm = original_norms[i];
+        cJSON* template_json;
+        cJSON_ArrayForEach(template_json, templates) {
+            char* role = cJSON_GetObjectItem(template_json, "role")->valuestring;
+            char* deontic_str = cJSON_GetObjectItem(template_json, "deontic")->valuestring;
+            char* action_template = cJSON_GetObjectItem(template_json, "action")->valuestring;
+
+            if (role && deontic_str && action_template) {
+                char final_action[1024];
+                // Replace placeholders
+                char temp_action[1024];
+                strncpy(temp_action, action_template, sizeof(temp_action));
+                // A basic replace for %{rule_id} and %{rule_action}
+                char* placeholder_id = strstr(temp_action, "%{rule_id}");
+                if (placeholder_id) {
+                    sprintf(final_action, "%.*s%d%s", (int)(placeholder_id - temp_action), temp_action, user_norm->number, placeholder_id + strlen("%{rule_id}"));
+                    strncpy(temp_action, final_action, sizeof(temp_action));
+                }
+                char* placeholder_action = strstr(temp_action, "%{rule_action}");
+                 if (placeholder_action) {
+                    sprintf(final_action, "%.*s%s%s", (int)(placeholder_action - temp_action), temp_action, user_norm->action, placeholder_action + strlen("%{rule_action}"));
+                } else {
+                    strncpy(final_action, temp_action, sizeof(final_action));
+                }
+
+                DeonticOperator deontic = config_get_deontic_operator(deontic_str);
+                Norm* new_norm = create_norm((*next_norm_id)++, strdup(role), deontic, strdup(final_action));
+                add_norm_to_schema(schema, new_norm);
+                printf("Added template-based norm for rule %d: %s\n", user_norm->number, final_action);
+            }
+        }
+    }
+}
+
+static void apply_conditional_on_id(Schema* schema, cJSON* conditional_on_id, int* next_norm_id) {
+    Norm* user_norm = schema->norms;
+    while(user_norm != NULL) {
+        if (user_norm->number >= 1000) { // Skip generated norms
+            user_norm = user_norm->next;
+            continue;
+        }
+
+        char rule_id_str[10];
+        snprintf(rule_id_str, sizeof(rule_id_str), "%d", user_norm->number);
+        
+        cJSON* conditional_norms = cJSON_GetObjectItem(conditional_on_id, rule_id_str);
+        if (cJSON_IsArray(conditional_norms)) {
+            cJSON* norm_json;
+            cJSON_ArrayForEach(norm_json, conditional_norms) {
+                // ... (logic to create and add norm, similar to domain defaults)
+                char* role = cJSON_GetObjectItem(norm_json, "role")->valuestring;
+                char* deontic_str = cJSON_GetObjectItem(norm_json, "deontic")->valuestring;
+                char* action = cJSON_GetObjectItem(norm_json, "action")->valuestring;
+
+                if (role && deontic_str && action) {
+                    char final_action[1024];
+                    strncpy(final_action, action, sizeof(final_action) - 1);
+
+                    cJSON* reference_json = cJSON_GetObjectItem(norm_json, "reference");
+                    if (reference_json && cJSON_IsString(reference_json)) {
+                         snprintf(final_action + strlen(final_action), sizeof(final_action) - strlen(final_action),
+                                 " [Ref: %s]", reference_json->valuestring);
+                    }
+                    
+                    DeonticOperator deontic = config_get_deontic_operator(deontic_str);
+                    Norm* new_norm = create_norm((*next_norm_id)++, strdup(role), deontic, strdup(final_action));
+                    add_norm_to_schema(schema, new_norm);
+                    printf("Added conditional norm triggered by rule %d: %s\n", user_norm->number, final_action);
+                }
+            }
+        }
+        user_norm = user_norm->next;
+    }
+}
+
+/**
+ * @brief Applies automated norms to a schema based on its domain and rules.
+ *
+ * This function orchestrates the three-tiered enrichment process:
+ * 1. Applies domain-specific default norms.
+ * 2. Applies universal template norms to all user-defined rules.
+ * 3. Applies conditional norms based on specific user-defined rule IDs.
+ *
+ * @param schema The schema to enrich with automated norms.
+ */
+void schema_apply_automated_norms(Schema* schema) {
+    if (schema == NULL || schema->institution == NULL || schema->institution->domain == NULL) {
+        return;
+    }
+
+    cJSON* automated_norms_config = config_get_automated_norms();
+    if (automated_norms_config == NULL) {
+        return; // No automated norms configured
+    }
+
+    int last_user_norm_id = 0;
+    for (Norm* n = schema->norms; n != NULL; n = n->next) {
+        if (n->number > last_user_norm_id) {
+            last_user_norm_id = n->number;
+        }
+    }
+    int next_automated_norm_id = (last_user_norm_id / 100 + 1) * 100;
+
+    // Tier 1: Apply Domain-Specific Default Norms
+    cJSON* domain_defaults = cJSON_GetObjectItem(automated_norms_config, "domain_defaults");
+    if (domain_defaults) {
+        apply_domain_defaults(schema, domain_defaults, &next_automated_norm_id);
+    }
+
+    // Tier 2: Apply Universal Template Norms
+    cJSON* universal_templates = cJSON_GetObjectItem(automated_norms_config, "universal_templates");
+    if (universal_templates) {
+        apply_universal_templates(schema, universal_templates, &next_automated_norm_id);
+    }
+
+    // Tier 3: Apply Rule-ID-Specific Conditional Norms
+    cJSON* conditional_on_id = cJSON_GetObjectItem(automated_norms_config, "conditional_on_id");
+    if (conditional_on_id) {
+        apply_conditional_on_id(schema, conditional_on_id, &next_automated_norm_id);
+    }
 }
 
